@@ -20,8 +20,7 @@ for line in lines:
     elif player_2 == 2:
         score_p2 += player_1 + 3
     else:
-        score_p2 += (player_1 + 1) if player_1 != 3 else 1
-        score_p2 += 6
+        score_p2 += ((player_1 + 1) if player_1 != 3 else 1) + 6
 
 print("Part 1 : ",score)     
 print("Part 2 : ",score_p2)
