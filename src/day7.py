@@ -1,38 +1,32 @@
 with open('../input/day7.txt') as f:
     lines = f.readlines()
 
-size_dict = dict()
-subfolder_dict = dict()
-cur_dir = '/'
-for line in lines:
-    if line[2:4] == "cd":
-        if line[5:] != "..\n":
-            prev_dir = cur_dir
-            cur_dir = line[5:].strip()
-        else:
-            cur_dir = prev_dir
-    elif line[0:3] == "dir":
-        if cur_dir not in subfolder_dict:
-            subfolder_dict[cur_dir] = [line[4:].strip()]
-        else:
-            subfolder_dict[cur_dir].append(line[4:].strip())
-    elif line[2:4] != "ls":
-        size = int(line.split()[0])
-        if cur_dir not in size_dict:
-            size_dict[cur_dir] = size
-        else:
-            size_dict[cur_dir] += size
+def directory_size_list(filesystem,index):
+    directory_size = 0
+    p1_sol = 0
+    filesystem_len = len(filesystem)
+    while index != filesystem_len:
+        line = filesystem[index]
+        index += 1
+        if line[2:4] == "cd" and line[5:] != "..\n":
+            sub_directory_size,p1_sub_size,index = directory_size_list(filesystem,index)
+            directory_size += sub_directory_size
+            p1_sol += p1_sub_size
+        elif line[2:4] == "cd" and line[5:] == "..\n":
+            if directory_size <= 100000:
+                p1_sol += directory_size
+            print(directory_size)
+            return directory_size,p1_sol,index
+        elif line[0:3] != "dir" and line[2:4] != "ls":
+            directory_size += int(line.split()[0])
+    
+    print(directory_size)
+    if directory_size <= 100000:
+        p1_sol += directory_size
+    return directory_size,p1_sol,index
 
-def total_size(size_dict,subfolder_dict,key):
-    if key in subfolder_dict:
-        for value in subfolder_dict[key]:
-            size_dict[key] += total_size(size_dict,subfolder_dict,value)
-    else:
-        return size_dict[key]
-    return size_dict[key]
+total_size,p1_size,index = directory_size_list(lines,0)
 
-total_size(size_dict,subfolder_dict,'/')
-
-p1 = [x if x <= 100000 else 0 for x in size_dict.values()]
-print(sum(p1))
+print(total_size)
+print(p1_size)
 
