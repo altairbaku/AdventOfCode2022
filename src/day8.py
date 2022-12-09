@@ -1,7 +1,6 @@
 with open('../input/day8.txt') as f:
     lines = f.readlines()
 
-
 forest = []
 for line in lines:
     row = [int(x) for x in line.strip()]
