@@ -29,7 +29,13 @@ for line in lines:
         prev_knot_coord = knot_coord[0]
         knot_coord[0] = [x + y for x, y in zip(knot_coord[0], delta)]
         for knot_n in range(1,10):
+            dist = abs(knot_coord[knot_n-1][0] - knot_coord[knot_n][0]) + abs(knot_coord[knot_n-1][1] - knot_coord[knot_n][1])
             if abs(knot_coord[knot_n-1][0] - knot_coord[knot_n][0]) == 2 or abs(knot_coord[knot_n-1][1] - knot_coord[knot_n][1]) == 2:
+                # knot_coord[knot_n] = [x - y for x, y in zip(knot_coord[n-1], delta)]
+                # if dist == 3:
+                #     print(dist)
+                #     knot_coord[knot_n] = [x - y for x, y in zip(knot_coord[n-1], delta)]
+                # else:
                 temp = knot_coord[knot_n]
                 knot_coord[knot_n] = prev_knot_coord
                 prev_knot_coord = temp
@@ -37,11 +43,7 @@ for line in lines:
                     t_visited.add(tuple(knot_coord[knot_n]))
                 if knot_n == 9:
                     t_visited_p2.add(tuple(knot_coord[knot_n]))
-            else:
-                break
-    if (iter == 2):
-        print(knot_coord)
-        break
-        
+
+print(t_visited_p2)    
 print("Part 1 : ",len(t_visited))
 print("Part 2 : ",len(t_visited_p2))
