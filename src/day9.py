@@ -31,7 +31,6 @@ for line in lines:
         delta = [0,-1]
 
     for n in range(steps):
-        prev_knot_coord = knot_coord[0]
         knot_coord[0] = [x + y for x, y in zip(knot_coord[0], delta)]
         for knot_n in range(1,10):
             if abs(knot_coord[knot_n-1][0] - knot_coord[knot_n][0]) >= 2 or abs(knot_coord[knot_n-1][1] - knot_coord[knot_n][1]) >= 2:
