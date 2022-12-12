@@ -36,7 +36,7 @@ monkey_count += 1
 
 def p1(items,operations,tests,throws):
     inspection_count =  [0] * monkey_count
-    for round in range(20):
+    for _ in range(20):
         for i in range(monkey_count):
             while items[i]:
                 inspection_count[i] += 1
@@ -53,7 +53,7 @@ def p1(items,operations,tests,throws):
 
 def p2(items,operations,tests,throws):
     inspection_count =  [0] * monkey_count
-    for round in range(10000):
+    for _ in range(10000):
         for i in range(monkey_count):
             while items[i]:
                 inspection_count[i] += 1
