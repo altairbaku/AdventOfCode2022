@@ -1,6 +1,7 @@
 from itertools import product
+from copy import deepcopy
 
-with open('../input/day14_example.txt') as f:
+with open('../input/day14.txt') as f:
     rock_paths = f.readlines()
 
 rock_indices = set()
@@ -18,6 +19,7 @@ for rock_path in rock_paths:
 lowest = max([x[1] for x in rock_indices])
 sand_units = 0
 flow = 0
+rock_indices_p1 = deepcopy(rock_indices)
 while not flow:
     sand_coord = (500,0)
     at_rest = 0
@@ -28,13 +30,13 @@ while not flow:
         possible_moves = [(sand_coord[0],down), (left,down),(right,down)]
         moved = 0
         for move in possible_moves:
-            if move not in rock_indices:
+            if move not in rock_indices_p1:
                 sand_coord = move
                 moved = 1
                 break
         if moved == 0:
             sand_units += 1
-            rock_indices.add(sand_coord)
+            rock_indices_p1.add(sand_coord)
             at_rest = 1
         if sand_coord[1] > lowest:
             flow = 1
