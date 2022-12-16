@@ -19,10 +19,11 @@ x_min = 0
 x_max = 0
 for sensor in sensors:
     x_pos = sensors[sensor] - abs(sensor[1]-y)
-    x_left = sensor[0] - x_pos
-    x_right = sensor[0] + x_pos
-    x_min = min(x_min,x_left)
-    x_max = max(x_max,x_right)
+    if x_pos >= 0:
+        x_left = sensor[0] - x_pos
+        x_right = sensor[0] + x_pos
+        x_min = min(x_min,x_left)
+        x_max = max(x_max,x_right)
 
 print("Part 1 : ",x_max-x_min)
 
