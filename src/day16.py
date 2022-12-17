@@ -11,3 +11,7 @@ for scan in valve_scan:
     cur_valve = valve_info.group(1)
     valve_flows[cur_valve] = int(valve_info.group(2))
     valve_tunnels[cur_valve] = re.findall(r'([A-Z]+)',split_scan[1])
+
+valves_opened = []
+
+
