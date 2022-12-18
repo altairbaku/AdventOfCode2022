@@ -1,6 +1,6 @@
 from itertools import product
 
-with open('../input/day14.txt') as f:
+with open('../input/14.txt') as f:
     rock_paths = f.readlines()
 
 rock_indices = set()

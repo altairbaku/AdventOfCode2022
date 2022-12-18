@@ -1,4 +1,4 @@
-with open('../input/day8.txt') as f:
+with open('../input/08.txt') as f:
     lines = f.readlines()
 
 forest = []

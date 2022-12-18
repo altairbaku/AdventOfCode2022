@@ -1,4 +1,4 @@
-with open('../input/day2.txt') as f:
+with open('../input/02.txt') as f:
     lines = f.readlines()
 
 score = 0

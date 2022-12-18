@@ -1,6 +1,6 @@
 import re
 
-with open('../input/day16.txt') as f:
+with open('../input/16.txt') as f:
     valve_scan = f.readlines()
 
 valve_flows = dict()

@@ -1,4 +1,4 @@
-with open('../input/day6.txt') as f:
+with open('../input/06.txt') as f:
     lines = f.readlines()
 
 def packet_start_marker(input,distinct_len):

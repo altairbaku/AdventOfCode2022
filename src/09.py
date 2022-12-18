@@ -1,6 +1,6 @@
 from itertools import product
 
-with open('../input/day9.txt') as f:
+with open('../input/09.txt') as f:
     lines = f.readlines()
 
 t_visited_p1 = {(0,0)}

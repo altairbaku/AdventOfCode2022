@@ -2,7 +2,7 @@ import re
 from collections import defaultdict
 import copy
   
-with open('../input/day5.txt') as f:
+with open('../input/05.txt') as f:
     lines = f.readlines()
 
 crate_dict_p1 = defaultdict(list)

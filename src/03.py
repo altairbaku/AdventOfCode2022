@@ -1,5 +1,5 @@
 import string
-with open('../input/day3.txt') as f:
+with open('../input/03.txt') as f:
     rucksacks = f.readlines()
 
 dict = {}

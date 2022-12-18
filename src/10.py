@@ -1,4 +1,4 @@
-with open('../input/day10.txt') as f:
+with open('../input/10.txt') as f:
     lines = f.readlines()
 
 cycle_number = 0

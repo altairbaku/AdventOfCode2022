@@ -1,5 +1,5 @@
 from collections import defaultdict, deque
-with open('../input/day12.txt') as f:
+with open('../input/12.txt') as f:
     lines = f.readlines()
 
 grid = []

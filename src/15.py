@@ -4,7 +4,7 @@ def manhattan_distance(a,b):
     dist = abs(a[0]-b[0])+abs(a[1]-b[1])
     return dist
 
-with open('../input/day15.txt') as f:
+with open('../input/15.txt') as f:
     sensor_readings = f.readlines()
 
 sensors = dict()

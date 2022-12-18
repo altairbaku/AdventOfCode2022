@@ -2,7 +2,7 @@ from collections import deque
 import math
 from copy import deepcopy
 
-with open('../input/day11.txt') as f:
+with open('../input/11.txt') as f:
     lines = f.readlines()
 
 monkey_count = 0

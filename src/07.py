@@ -1,4 +1,4 @@
-with open('../input/day7.txt') as f:
+with open('../input/07.txt') as f:
     lines = f.readlines()
 
 def directory_size_list(filesystem,index):

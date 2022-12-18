@@ -1,4 +1,4 @@
-with open('../input/day4.txt') as f:
+with open('../input/04.txt') as f:
     pairs = f.readlines()
 
 subset_count = 0
