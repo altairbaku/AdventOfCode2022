@@ -34,66 +34,45 @@ def shortest_path(graph,initial,end):
         path_index += 1
     return []
 
-def find_next_node(cur_valve,pressure_released,time,opened_valves,pressure_valves,valve_flows):
-    pressure_dict = dict()
-    for x in pressure_valves:
-        print(opened_valves)
-        if x != cur_valve and x not in opened_valves:
-            len_path = len(shortest_path(valve_tunnels,cur_valve,x))
-            new_time = time - len_path
-            if (new_time) > 0:
-                new_pressure = pressure_released + (new_time) * valve_flows[x]
-                pressure_dict[(cur_valve,x)] = [new_pressure,new_time]
-            else:
-                return pressure_released,opened_valves
-    if pressure_dict:
-        max_pressure = max(pressure_dict.values(),key = lambda x:x[0]/(30 - x[1]))
-        cur_valve = [k[1] for k,v in pressure_dict.items() if v == max_pressure]
-        opened_valves.append(cur_valve)
-        time = max_pressure[1]
-        pressure_released = max_pressure[0]
-        return find_next_node(cur_valve[0],pressure_released,time,opened_valves,pressure_valves,valve_flows)
+def find_next_valve(pressure_valves,opened_valves,cur_valve):
+    pressure_max = -10
+    if len(pressure_valves) -len(opened_valves) > 1:
+        for x in pressure_valves:
+            pressure = 0
+            for y in pressure_valves:
+                if x not in opened_valves and y not in opened_valves and x != y:
+                    pressure += (30 - len(shortest_path(valve_tunnels,x,y))) * valve_flows[y]
+            print(x,pressure)
+            pressure = pressure * (30 - len(shortest_path(valve_tunnels,x,cur_valve))) * valve_flows[x]
+            print(x,pressure)
+            if pressure > pressure_max:
+                pressure_max = pressure
+                next_valve = x
+            elif pressure == pressure_max:
+                next_valve = x if valve_flows[x] > valve_flows[next_valve] else next_valve
+    else:
+        rem_valves = [x for x in pressure_valves if x not in set(opened_valves)]
+        next_valve = rem_valves[0]
+    return len(shortest_path(valve_tunnels,cur_valve,next_valve)),next_valve
 
-
-max_pressure = 0
-pressure_valves = [key for (key,value) in valve_flows.items() if value !=0]
-cur_valve = 'AA'
-time = 30
 pressure_released = 0
+pressure_valves = [key for (key,value) in valve_flows.items() if value !=0]
+pressure_valves = sorted(pressure_valves,key = lambda x:valve_flows[x],reverse=True)
+time = 30
+cur_valve = 'AA'
 opened_valves = []
-print(find_next_node(cur_valve,pressure_released,time,opened_valves,pressure_valves,valve_flows))
-# path_len_dict = dict()
-# for x in pressure_valves:
-#     len_path = len(shortest_path(valve_tunnels,cur_valve,x))
-#     path_len_dict[(cur_valve,x)] = [(time-len_path) * valve_flows[x],time-len_path]
-# if path_len_dict:
-#     max_pressure = max(path_len_dict.values(),key = lambda x:x[0]/(30 - x[1]))
-#     max_valve = [k for k,v in path_len_dict.items() if v == max_pressure]
-#     cur_valve = max_valve[0][-1]
-#     opened_valves.append(cur_valve)
-#     time = max_pressure[1]
-#     pressure_released += max_pressure[0]
-
-# while time > 0:
-#     for x in pressure_valves:
-#         if x != cur_valve and x not in opened_valves:
-#             len_path = len(shortest_path(valve_tunnels,cur_valve,x))
-#             new_pressure = path_len_dict[max_valve[0]][0] + (time - len_path) * valve_flows[x] if path_len_dict else (time-len_path) * valve_flows[x]
-#             valve_list = list(max_valve[0])
-#             valve_list.append(x)
-#             new_tuple = tuple(valve_list)
-#             path_len_dict[new_tuple] = [new_pressure,time-len_path] if (time-len_path) > 0 else [path_len_dict[max_valve[0]][0],0]
-#     print(path_len_dict)
-#     print(time)
-#     if path_len_dict:
-#         max_pressure = sorted(path_len_dict.items(),key = lambda x:x[1][0]/(30 - x[1][1]),reverse=True)[:1]
-#         path_len_dict = dict(max_pressure)
-#         max_valve = [k for k,v in path_len_dict.items() if v == max_pressure]
-#         cur_valve = max_valve[0][-1]
-#         opened_valves.append(cur_valve)
-#         time = max_pressure[1]
-#         pressure_released += max_pressure[0]
+while True:
+    if time <= 0 or len(pressure_valves) == len(opened_valves):
+        break
+    time_elapsed,next_valve = find_next_valve(pressure_valves,opened_valves,cur_valve)
+    time -= time_elapsed
+    if time > 0:
+        pressure_released += time * valve_flows[next_valve]
+        cur_valve = next_valve
+        opened_valves.append(cur_valve)
+        print(opened_valves)
 
 print(pressure_released)
+
 
 
