@@ -1,6 +1,7 @@
 import re
+from itertools import combinations, permutations
 
-with open('../input/16_example.txt') as f:
+with open('../input/16.txt') as f:
     valve_scan = f.readlines()
 
 valve_flows = dict()
@@ -34,30 +35,39 @@ def shortest_path(graph,initial,end):
         path_index += 1
     return []
 
+pressure_valves = [key for (key,value) in valve_flows.items() if value !=0]
+valve_combinations = list(combinations(pressure_valves,2))
+dist_dict = dict()
+start_valve = 'AA'
+for combo in valve_combinations:
+    combo_dist = len(shortest_path(valve_tunnels,combo[0],combo[1]))
+    dist_dict[combo] = combo_dist
+    dist_dict[(combo[1],combo[0])] = combo_dist
+    dist_dict[(start_valve,combo[0])] = len(shortest_path(valve_tunnels,start_valve,combo[0]))
+    dist_dict[(start_valve,combo[1])] = len(shortest_path(valve_tunnels,start_valve,combo[1]))
+
+
 def find_next_valve(pressure_valves,opened_valves,cur_valve):
-    pressure_max = -10
-    if len(pressure_valves) -len(opened_valves) > 1:
-        for x in pressure_valves:
-            pressure = 0
-            for y in pressure_valves:
-                if x not in opened_valves and y not in opened_valves and x != y:
-                    pressure += (30 - len(shortest_path(valve_tunnels,x,y))) * valve_flows[y]
-            print(x,pressure)
-            pressure = pressure * (30 - len(shortest_path(valve_tunnels,x,cur_valve))) * valve_flows[x]
-            print(x,pressure)
-            if pressure > pressure_max:
-                pressure_max = pressure
-                next_valve = x
-            elif pressure == pressure_max:
-                next_valve = x if valve_flows[x] > valve_flows[next_valve] else next_valve
+    max_cost = -10
+    unopened_valves = [x for x in pressure_valves if x not in opened_valves]
+    permute_valves = list(permutations(unopened_valves,2))
+    if (permute_valves):
+        for valve_combo in permute_valves:
+            flow_0 = valve_flows[valve_combo[0]]
+            flow_1 = valve_flows[valve_combo[1]]
+            dist_0 = 30 - dist_dict[(cur_valve,valve_combo[0])]
+            dist_1 = dist_0 - dist_dict[valve_combo]
+            cost = (flow_0 * dist_0 + flow_1 * dist_1)/(30 - dist_1)
+            if cost > max_cost:
+                max_cost = cost
+                time = 30 - dist_0
+                next_valve = valve_combo[0]
     else:
-        rem_valves = [x for x in pressure_valves if x not in set(opened_valves)]
-        next_valve = rem_valves[0]
-    return len(shortest_path(valve_tunnels,cur_valve,next_valve)),next_valve
+        time = dist_dict[cur_valve,unopened_valves[0]]
+        next_valve = unopened_valves[0]
+    return time,next_valve
 
 pressure_released = 0
-pressure_valves = [key for (key,value) in valve_flows.items() if value !=0]
-pressure_valves = sorted(pressure_valves,key = lambda x:valve_flows[x],reverse=True)
 time = 30
 cur_valve = 'AA'
 opened_valves = []
@@ -70,7 +80,6 @@ while True:
         pressure_released += time * valve_flows[next_valve]
         cur_valve = next_valve
         opened_valves.append(cur_valve)
-        print(opened_valves)
 
 print(pressure_released)
 
