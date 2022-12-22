@@ -22,7 +22,8 @@ for i in range(len(lines) - 2):
 full_map = open_tiles.union(solid_walls)
 path = re.split('(\d+)', lines[len(lines)-1].strip())[1:-1]
 
-pos = min(open_tiles)
+pos = max(open_tiles)
+print(pos)
 step = [0,1]
 
 for instruction in path:
@@ -32,7 +33,7 @@ for instruction in path:
             if next_pos not in full_map:
                 if next_pos[0] < pos[0] and next_pos[1] == pos[1]:
                     next_pos = max({element for element in full_map if element[1] == pos[1]})
-                elif next_pos[0] < pos[0] and next_pos[1] == pos[1]:
+                elif next_pos[0] > pos[0] and next_pos[1] == pos[1]:
                     next_pos = min({element for element in full_map if element[1] == pos[1]})
                 elif next_pos[0] == pos[0] and next_pos[1] < pos[1]:
                     next_pos = max({element for element in full_map if element[0] == pos[0]})
@@ -49,8 +50,9 @@ for instruction in path:
     else:
         step = rotate2d(step,-1)
 
-print(pos)
 print(step)
+print(pos)
+print(1000 * (1 - pos[0]) + 4 * (pos[1]+ 1))
 
 
 
