@@ -23,7 +23,6 @@ full_map = open_tiles.union(solid_walls)
 path = re.split('(\d+)', lines[len(lines)-1].strip())[1:-1]
 
 pos = max(open_tiles)
-print(pos)
 step = [0,1]
 
 for instruction in path:
@@ -50,8 +49,6 @@ for instruction in path:
     else:
         step = rotate2d(step,-1)
 
-print(step)
-print(pos)
 print(1000 * (1 - pos[0]) + 4 * (pos[1]+ 1))
 
 
