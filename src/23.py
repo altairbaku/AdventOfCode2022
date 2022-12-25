@@ -1,5 +1,4 @@
 from collections import deque,defaultdict
-from copy import deepcopy
 with open('../input/23.txt') as f:
     lines = f.readlines()
 
@@ -21,7 +20,6 @@ directional_elves = deque([lambda x: [(x[0]-1,x[1]-1),(x[0]-1,x[1]),(x[0]-1,x[1]
 all_directions = lambda a: [(a[0]-1,a[1]-1),(a[0]-1,a[1]),(a[0]-1,a[1]+1),(a[0]+1,a[1]-1),(a[0]+1,a[1]),(a[0]+1,a[1]+1),(a[0],a[1]+1),(a[0],a[1]-1)]
 
 for round in range(1000):
-    prev_elf_pos_set = deepcopy(elf_pos_set)
     d = defaultdict(list)
     for elf,pos in elf_pos_dict.items():
         neighbors = all_directions(pos)

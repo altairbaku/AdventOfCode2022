@@ -50,7 +50,7 @@ for combo in valve_combinations:
 def find_next_valve(pressure_valves,opened_valves,cur_valve):
     max_cost = -10
     unopened_valves = [x for x in pressure_valves if x not in opened_valves]
-    permute_valves = list(permutations(unopened_valves,2))
+    permute_valves = list(permutations(unopened_valves,2)) 
     if (permute_valves):
         for valve_combo in permute_valves:
             flow_0 = valve_flows[valve_combo[0]]

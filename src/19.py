@@ -29,8 +29,6 @@ for blueprint in blueprints:
         obsidian += obsidian_robots
         geode += geode_robots
 
-        print(ore)
-
         if build_ore:
             ore_robots += 1
             build_ore = 0

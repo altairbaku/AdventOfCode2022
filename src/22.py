@@ -42,14 +42,14 @@ for instruction in path:
             if next_pos in solid_walls:
                 break
             elif next_pos in open_tiles:
-                pos = deepcopy(next_pos)
+                pos = next_pos
 
     elif instruction == 'R':
         step = rotate2d(step,1)
     else:
         step = rotate2d(step,-1)
 
-print(1000 * (1 - pos[0]) + 4 * (pos[1]+ 1))
+print("Part 1 : ",1000 * (1 - pos[0]) + 4 * (pos[1]+ 1))
 
 
 
