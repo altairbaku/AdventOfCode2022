@@ -19,4 +19,4 @@ while decimal_sum >= 2:
     else:
         snafu_sum = reverse_snafu[remainder - 5] + snafu_sum
 
-print(snafu_sum)
+print("Part 1 : ",snafu_sum)

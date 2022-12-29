@@ -1,3 +1,5 @@
+from queue import PriorityQueue
+
 with open('../input/24.txt') as f:
     lines = f.readlines()
 
@@ -14,28 +16,20 @@ for i in range(len(lines)):
         elif char == '#':
             walls.add((i-1,j-1))
 
-def feasible_moves(pos,blizzards_set):
-    moves = {(pos[0]+1,pos[1]),(pos[0]-1,pos[1]),(pos[0],pos[1]+1),(pos[0],pos[1]-1)}
-    new_moves =  moves & (moves ^ walls ^ blizzards_set)
-    min_distance = 10000
-    best_move = pos
-    for move in new_moves:
-        goal_distance = abs(move[0]-end_pos[0]) + abs(move[1]-end_pos[1])
-        if goal_distance < min_distance:
-            best_move = move
-            min_distance = goal_distance
-    return best_move
-
-
 cur_pos = min(no_blizzards)
 end_pos = max(no_blizzards)
-print(cur_pos)
-print(end_pos)
-x_wrap = 20
-y_wrap = 150
+walls.add((cur_pos[0] - 1,cur_pos[1]))
+walls.add((end_pos[0] + 1,end_pos[1]))
+x_wrap = end_pos[0]
+y_wrap = end_pos[1]+1
 
-time = 0
-while cur_pos != end_pos:
+cost_dict = dict()
+for i in range(-2,x_wrap+2):
+    for j in range(-2,y_wrap+2):
+        cost_dict[(i,j)] = abs(end_pos[1]-j) + abs(end_pos[0]-i)
+
+map_dict = dict()
+for n in range(1000):
     blizzards_set = set()
     for k,v in blizzards.items():
         if k == '>':
@@ -47,11 +41,41 @@ while cur_pos != end_pos:
         else:
             new_v = [((x[0]+1) % x_wrap,x[1]) for x in v]
         blizzards_set.update(set(new_v))
-        blizzards[k] = new_v       
-    cur_pos = feasible_moves(cur_pos,blizzards_set)
-    time += 1
+        blizzards[k] = new_v
+    map_dict[n] = blizzards_set    
 
-print(time)
+def feasible_moves(pos,blizzards_set):
+    moves = {(pos[0],pos[1]),(pos[0]+1,pos[1]),(pos[0]-1,pos[1]),(pos[0],pos[1]+1),(pos[0],pos[1]-1)}
+    new_moves =  moves & (moves ^ walls ^ blizzards_set)
+    return new_moves
+
+def dijkstra_search(start,goal,time):
+    pq = PriorityQueue()
+    pq.put((0,start,time))
+    times = dict()
+    visited = set()
+    while not pq.empty():    
+        current = pq.get()
+        pos = current[1]
+        time = current[2]
+        if current[1] == goal:
+            break
+        if (pos,time) not in visited:
+            visited.add((pos,time))
+            neighbors = feasible_moves(current[1],map_dict[current[2]])
+            new_time = time + 1
+            for neighbor in neighbors:
+                new_time = time + 1
+                new_cost = cost_dict[neighbor] + time
+                pq.put((new_cost,neighbor,new_time))
+                times[neighbor] = new_time
+
+    return times[goal]
+
+time_p1 = dijkstra_search(cur_pos,end_pos,0)
+print("Part 1 : ",time_p1)
+time_p2 = dijkstra_search(cur_pos,end_pos,dijkstra_search(end_pos,cur_pos,time_p1))
+print("Part 2 : ",time_p2)
         
 
 

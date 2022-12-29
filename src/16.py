@@ -1,7 +1,7 @@
 import re
 from itertools import combinations, permutations
 
-with open('../input/16.txt') as f:
+with open('../input/16_example.txt') as f:
     valve_scan = f.readlines()
 
 valve_flows = dict()
