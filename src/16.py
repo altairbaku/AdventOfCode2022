@@ -1,7 +1,8 @@
 import re
-from itertools import combinations, permutations
+from itertools import combinations
+import heapq
 
-with open('../input/16_example.txt') as f:
+with open('../input/16.txt') as f:
     valve_scan = f.readlines()
 
 valve_flows = dict()
@@ -35,6 +36,66 @@ def shortest_path(graph,initial,end):
         path_index += 1
     return []
 
+def optimal_valve_opening(valve_options,time_limit):
+    valve_heap = []
+    heapq.heappush(valve_heap,(0,['AA'],0))
+    min_cost = 0
+    while valve_heap:
+        valve_info = heapq.heappop(valve_heap)
+        opened_valves = valve_info[1]
+        cur_valve = opened_valves[-1]
+        time = valve_info[2]
+        min_cost = min(min_cost,valve_info[0])
+        for valve in valve_options:
+            if valve not in opened_valves:
+                new_time = time + dist_dict[(cur_valve,valve)]
+                cost = valve_info[0] + (new_time - time_limit) * valve_flows[valve]
+                new_opened_valves = opened_valves + [valve]
+                if new_time <= time_limit:
+                    heapq.heappush(valve_heap,(cost,new_opened_valves,new_time))
+    return (-min_cost)
+
+def optimal_valve_opening_p2(valve_options,time_limit):
+    elephant_valve_heap = []
+    human_valve_heap = []
+    min_cost = 0
+    heapq.heappush(human_valve_heap,(0,['AA'],0))
+    heapq.heappush(elephant_valve_heap,(0,['AA'],0))
+    combined_heap = []
+    heapq.heappush(combined_heap,(0,['AA'],0,0))
+    while combined_heap:
+        valve_info = heapq.heappop(combined_heap)
+        time_1 = valve_info[2]
+        time_2 = valve_info[3]
+        opened_valves = valve_info[1]
+        cur_valve_1 = opened_valves[-1] if len(opened_valves) == 1 else opened_valves[-2]
+        cur_valve_2 = opened_valves[-1]
+        cost = valve_info[0]
+        if cost < min_cost:
+            min_cost = cost
+            print(min_cost)
+            print(valve_info)
+        # min_cost = min(min_cost,valve_info[0])
+        for valve_1 in valve_options:
+            if valve_1 not in opened_valves:
+                new_time_1 = time_1 + dist_dict[(cur_valve_1,valve_1)]
+                cost_1 = (new_time_1 - time_limit) * valve_flows[valve_1]
+                for valve_2 in valve_options:
+                    if valve_2 != valve_1 and valve_2 not in opened_valves:
+                        new_time_2 = time_2 + dist_dict[(cur_valve_2,valve_2)]
+                        cost_2 = (new_time_2 - time_limit) * valve_flows[valve_2]
+                        if new_time_2 <= time_limit and new_time_1 <= time_limit:
+                            new_opened_valves = opened_valves + [valve_1,valve_2]
+                            heapq.heappush(combined_heap,(cost_1 + cost_2 + cost,new_opened_valves,new_time_1,new_time_2))
+                        elif new_time_2 <= time_limit:
+                            new_opened_valves = opened_valves + [valve_2]
+                            heapq.heappush(combined_heap,(cost_2 + cost,new_opened_valves,time_1,new_time_2))
+                        elif new_time_1 <= time_limit:
+                            new_opened_valves = opened_valves + [valve_1]
+                            heapq.heappush(combined_heap,(cost_1 + cost,new_opened_valves,new_time_1,time_2))
+    return(-min_cost)
+
+
 pressure_valves = [key for (key,value) in valve_flows.items() if value !=0]
 valve_combinations = list(combinations(pressure_valves,2))
 dist_dict = dict()
@@ -46,42 +107,10 @@ for combo in valve_combinations:
     dist_dict[(start_valve,combo[0])] = len(shortest_path(valve_tunnels,start_valve,combo[0]))
     dist_dict[(start_valve,combo[1])] = len(shortest_path(valve_tunnels,start_valve,combo[1]))
 
-
-def find_next_valve(pressure_valves,opened_valves,cur_valve):
-    max_cost = -10
-    unopened_valves = [x for x in pressure_valves if x not in opened_valves]
-    permute_valves = list(permutations(unopened_valves,2)) 
-    if (permute_valves):
-        for valve_combo in permute_valves:
-            flow_0 = valve_flows[valve_combo[0]]
-            flow_1 = valve_flows[valve_combo[1]]
-            dist_0 = 30 - dist_dict[(cur_valve,valve_combo[0])]
-            dist_1 = dist_0 - dist_dict[valve_combo]
-            cost = (flow_0 * dist_0 + flow_1 * dist_1)/(30 - dist_1)
-            if cost > max_cost:
-                max_cost = cost
-                time = 30 - dist_0
-                next_valve = valve_combo[0]
-    else:
-        time = dist_dict[cur_valve,unopened_valves[0]]
-        next_valve = unopened_valves[0]
-    return time,next_valve
-
-pressure_released = 0
-time = 30
-cur_valve = 'AA'
-opened_valves = []
-while True:
-    if time <= 0 or len(pressure_valves) == len(opened_valves):
-        break
-    time_elapsed,next_valve = find_next_valve(pressure_valves,opened_valves,cur_valve)
-    time -= time_elapsed
-    if time > 0:
-        pressure_released += time * valve_flows[next_valve]
-        cur_valve = next_valve
-        opened_valves.append(cur_valve)
-
+pressure_released = optimal_valve_opening(pressure_valves,30)
 print(pressure_released)
 
+pressure_released_p2 = optimal_valve_opening_p2(pressure_valves,26)
+print(pressure_released_p2)
 
 

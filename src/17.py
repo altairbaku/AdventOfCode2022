@@ -1,4 +1,4 @@
-from collections import deque,defaultdict
+from collections import deque
 
 with open('../input/17.txt') as f:
     lines = f.readlines()
@@ -15,24 +15,22 @@ rock_shapes = deque([lambda x1 : {(2,x1+4),(3,x1+4),(4,x1+4),(5,x1+4)},
                     lambda x5 : {(2,x5+4),(3,x5+4),(2,x5+5),(3,x5+5)}])
 
 rocks = 0
+rocks_n = 5
 highest_rock = 0
-jet_index = 0
-total_jets = len(jet_pattern)
 width = 7
 fallen_rocks = {(i,0) for i in range(width)}
-
-jet_dict = defaultdict(int)
-print(total_jets)
-repeating = 40
+rock_heights = []
 max_height = 0
-while rocks < 1000:
+jet_index = 0
+total_jets = len(jet_pattern)
+while rocks < 10000:
     current_rock = rock_shapes[0](highest_rock)
     while True:
         if jet_pattern[jet_index] == '<':
             jet_move ={(x[0]-1,x[1]) for x in current_rock}
         else:
             jet_move ={(x[0]+1,x[1]) for x in current_rock}
-        if not jet_move.intersection(fallen_rocks) and max(jet_move)[0] < 7 and min(jet_move)[0] >= 0:
+        if not jet_move.intersection(fallen_rocks) and max(jet_move)[0] < width and min(jet_move)[0] >= 0:
             current_rock = jet_move
         jet_index = (jet_index + 1) % total_jets
         down_move = {(x[0],x[1] - 1) for x in current_rock}
@@ -44,10 +42,28 @@ while rocks < 1000:
             highest_rock = max(fallen_rocks, key= lambda x : x[1])[1]
             break
     rocks += 1
-    jet_dict[jet_index] += 1
-    if rocks % repeating == 0:
-        print(highest_rock - max_height)
-        max_height = highest_rock
     rock_shapes.rotate(-1)
 
-print(max(fallen_rocks, key= lambda x : x[1])[1])
+    if rocks % rocks_n == 0:
+        rock_height = highest_rock - max_height
+        max_height = highest_rock   
+        rock_heights.append(rock_height)
+    if rocks == 2022:
+        print("Part 1 : ",highest_rock)
+
+def seq_len(seq):
+    rep_len = 1
+    max_len = int(len(seq) / 3)
+    for x in range(2,max_len):
+        if seq[2*x:3*x] == seq[3*x : 4*x]:
+            return x
+    return rep_len
+
+rock_count = 1000000000000
+rep_seq = seq_len(rock_heights)
+initial_sum = sum(rock_heights[0:rep_seq])
+repeat_heights = rock_heights[rep_seq:2*rep_seq]
+repeating_sum = sum(repeat_heights)
+total_height = initial_sum + int((rock_count - rep_seq * rocks_n) / (rep_seq * rocks_n)) * repeating_sum
+total_height += sum(repeat_heights[0 : int(((rock_count - rep_seq * rocks_n) % (rep_seq * rocks_n))/rocks_n)])
+print("Part 2 : ",total_height)
