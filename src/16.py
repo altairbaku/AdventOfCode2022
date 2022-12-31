@@ -55,49 +55,8 @@ def optimal_valve_opening(valve_options,time_limit):
                     heapq.heappush(valve_heap,(cost,new_opened_valves,new_time))
     return (-min_cost)
 
-def optimal_valve_opening_p2(valve_options,time_limit):
-    elephant_valve_heap = []
-    human_valve_heap = []
-    min_cost = 0
-    heapq.heappush(human_valve_heap,(0,['AA'],0))
-    heapq.heappush(elephant_valve_heap,(0,['AA'],0))
-    combined_heap = []
-    heapq.heappush(combined_heap,(0,['AA'],0,0))
-    while combined_heap:
-        valve_info = heapq.heappop(combined_heap)
-        time_1 = valve_info[2]
-        time_2 = valve_info[3]
-        opened_valves = valve_info[1]
-        cur_valve_1 = opened_valves[-1] if len(opened_valves) == 1 else opened_valves[-2]
-        cur_valve_2 = opened_valves[-1]
-        cost = valve_info[0]
-        if cost < min_cost:
-            min_cost = cost
-            print(min_cost)
-            print(valve_info)
-        # min_cost = min(min_cost,valve_info[0])
-        for valve_1 in valve_options:
-            if valve_1 not in opened_valves:
-                new_time_1 = time_1 + dist_dict[(cur_valve_1,valve_1)]
-                cost_1 = (new_time_1 - time_limit) * valve_flows[valve_1]
-                for valve_2 in valve_options:
-                    if valve_2 != valve_1 and valve_2 not in opened_valves:
-                        new_time_2 = time_2 + dist_dict[(cur_valve_2,valve_2)]
-                        cost_2 = (new_time_2 - time_limit) * valve_flows[valve_2]
-                        if new_time_2 <= time_limit and new_time_1 <= time_limit:
-                            new_opened_valves = opened_valves + [valve_1,valve_2]
-                            heapq.heappush(combined_heap,(cost_1 + cost_2 + cost,new_opened_valves,new_time_1,new_time_2))
-                        elif new_time_2 <= time_limit:
-                            new_opened_valves = opened_valves + [valve_2]
-                            heapq.heappush(combined_heap,(cost_2 + cost,new_opened_valves,time_1,new_time_2))
-                        elif new_time_1 <= time_limit:
-                            new_opened_valves = opened_valves + [valve_1]
-                            heapq.heappush(combined_heap,(cost_1 + cost,new_opened_valves,new_time_1,time_2))
-    return(-min_cost)
-
-
 pressure_valves = [key for (key,value) in valve_flows.items() if value !=0]
-valve_combinations = list(combinations(pressure_valves,2))
+valve_combinations = combinations(pressure_valves,2)
 dist_dict = dict()
 start_valve = 'AA'
 for combo in valve_combinations:
@@ -110,7 +69,14 @@ for combo in valve_combinations:
 pressure_released = optimal_valve_opening(pressure_valves,30)
 print(pressure_released)
 
-pressure_released_p2 = optimal_valve_opening_p2(pressure_valves,26)
-print(pressure_released_p2)
+human_valve_combos = combinations(pressure_valves,int(len(pressure_valves)/2))
+max_pressure = 0
+for human_valves in human_valve_combos:
+    human_pressure = optimal_valve_opening(human_valves,26)
+    elephant_valves = [x for x in pressure_valves if x not in human_valves]
+    elephant_pressure = optimal_valve_opening(elephant_valves,26)
+    max_pressure = max(max_pressure,human_pressure + elephant_pressure)
+
+print(max_pressure)
 
 
