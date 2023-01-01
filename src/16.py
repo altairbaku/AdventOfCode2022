@@ -67,7 +67,7 @@ for combo in valve_combinations:
     dist_dict[(start_valve,combo[1])] = len(shortest_path(valve_tunnels,start_valve,combo[1]))
 
 pressure_released = optimal_valve_opening(pressure_valves,30)
-print(pressure_released)
+print("Part 1 : ",pressure_released)
 
 human_valve_combos = combinations(pressure_valves,int(len(pressure_valves)/2))
 max_pressure = 0
@@ -77,6 +77,6 @@ for human_valves in human_valve_combos:
     elephant_pressure = optimal_valve_opening(elephant_valves,26)
     max_pressure = max(max_pressure,human_pressure + elephant_pressure)
 
-print(max_pressure)
+print("Part 2 : ",max_pressure)
 
 
