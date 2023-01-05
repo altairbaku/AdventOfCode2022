@@ -1,63 +1,87 @@
 import re
-with open('../input/19_example.txt') as f:
+import math
+from copy import deepcopy
+
+with open('../input/19.txt') as f:
     blueprints = f.readlines()
 
+bps = []
 for blueprint in blueprints:
     m = re.findall('[0-9]+', blueprint)
-    ore_robot_req = int(m[1])
-    clay_robot_req = int(m[2])
-    obsidian_robot_req = [int(m[3]),int(m[4])]
-    geode_robot_req = [int(m[5]),int(m[6])]
+    ore_robot_req = [int(m[1]),0,0,0]
+    clay_robot_req = [int(m[2]),0,0,0]
+    obsidian_robot_req = [int(m[3]),int(m[4]),0,0]
+    geode_robot_req = [int(m[5]),0,int(m[6]),0]
+    bps.append([ore_robot_req,clay_robot_req,obsidian_robot_req,geode_robot_req])
 
-    ore_robots = 1
-    clay_robots = 0
-    obsidian_robots = 0
-    geode_robots = 0
+def find_max_geodes(req,timemax):
+    time = 0
+    robots = [1,0,0,0]
+    resources = [0,0,0,0]
+    mineral_heap = []
+    mineral_heap.append([time, robots, resources])
+    max_geodes = 0
 
-    ore = 0
-    clay = 0
-    obsidian = 0
-    geode = 0
+    max_res = 4 * [0]
+    for cost in req:
+        for j in range(len(cost)):
+            if cost[j] > max_res[j]:
+                max_res[j] = cost[j]
 
-    build_ore = 0
-    build_clay = 0
-    build_obsidian = 0
-    build_geode = 0
-    for n in range(0,24):
-        ore += ore_robots
-        clay += clay_robots
-        obsidian += obsidian_robots
-        geode += geode_robots
+    while mineral_heap:
+        time, robots, resources = mineral_heap.pop(0)
+        geodes = resources[3] + robots[3] * (timemax - time)
+        if geodes > max_geodes:
+            max_geodes = geodes
 
-        if build_ore:
-            ore_robots += 1
-            build_ore = 0
+        for i in range(len(req)):
+            cost = req[i]
+            time_needed = [0,0,0,0]
+            for j in range(len(cost)):
+                if cost[j]:
+                    if cost[j] <= resources[j]:
+                        continue
+                    else:
+                        if robots[j]:
+                            time_needed[j] = math.ceil((cost[j] - resources[j])/robots[j])
+                        else:
+                            time_needed[j] = timemax + 1
 
-        if build_clay:
-            clay_robots += 1
-            build_clay = 0
+            dt = max(time_needed)
+            if time+dt+1+1 <= timemax:
+                resources_new = 4 * [0]
+                for n in range(4):
+                    resources_new[n] = resources[n] + (dt+1) * robots[n] - cost[n]
 
-        if build_obsidian:
-            obsidian_robots += 1
-            build_obsidian = 0
+                robots_new = deepcopy(robots)
+                robots_new[i] += 1
 
-        if build_geode:
-            geode_robots += 1
-            build_geode = 0
+                if sum([robots_new[x] <=  max_res[x] for x in range(3)]) != 3:
+                    continue
 
-        if (geode_robot_req[0] <= ore and geode_robot_req[1] <= obsidian):
-            ore -= geode_robot_req[0]
-            obsidian -= geode_robot_req[1]
-            build_geode = 1
-        elif (obsidian_robot_req[0] <= ore and obsidian_robot_req[1] <= clay):
-            ore -= obsidian_robot_req[0]
-            clay -= obsidian_robot_req[1]
-            build_obsidian = 1
-        elif (clay_robot_req <= ore):
-            ore -= clay_robot_req
-            build_clay = 1
-        elif (ore_robot_req <= ore):
-            ore -= ore_robot_req
-            build_ore = 1
-    print(geode)
+                timeleft = timemax - (time+dt+1)
+                geodes_new_ideal = (timeleft - 1)*timeleft//2
+                geodes_final_ideal = resources_new[3] + timeleft * robots_new[3] + geodes_new_ideal
+                if geodes_final_ideal <= max_geodes:
+                    continue
+                
+                state_new = [time+dt+1,robots_new,resources_new]
+                if state_new not in mineral_heap:
+                    mineral_heap.append(state_new)
+    return max_geodes
 
+
+id = 1
+quality_sum = 0
+for bp in bps:
+    quality_sum += id * find_max_geodes(bp,24)
+    id+=1
+print(quality_sum)
+
+quality_prod = 1
+for n in range(3):
+    bp_geode = find_max_geodes(bps[n],32)
+    quality_prod *= bp_geode
+print(quality_prod)
+
+    
